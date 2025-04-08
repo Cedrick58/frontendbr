@@ -8,7 +8,7 @@ const APP_SHELL_FILES = [
   '/', 
   '/index.html', 
   '/offline.html',
-  '/index.css',
+  '/index.css', 
   '/App.css',
   '/App.jsx',
   '/main.jsx',
@@ -60,11 +60,22 @@ function saveToIndexedDB(data) {
     store.add(data);
     tx.oncomplete = () => {
       console.log("Usuario guardado offline");
-      self.registration.sync?.register('syncUsuarios');
+      // Verificar si Background Sync está disponible y registrar
+      if ('SyncManager' in self) {
+        self.registration.sync.register('syncUsuarios')
+          .then(() => {
+            console.log("Sincronización registrada con éxito");
+          })
+          .catch(err => {
+            console.error("Error al registrar la sincronización:", err);
+          });
+      } else {
+        console.warn("⚠️ Background Sync no es soportado en este navegador.");
+      }
     };
   };
 
-  request.onerror = e => console.error("Error IndexedDB:", e.target.error);
+  request.onerror = e => console.error("Error en IndexedDB:", e.target.error);
 }
 
 // Interceptar requests
@@ -140,14 +151,4 @@ self.addEventListener('sync', event => {
       })
     );
   }
-});
-
-// Notificaciones push
-self.addEventListener("push", event => {
-  const options = {
-    body: event.data?.text() || "Notificación recibida",
-    image: "./icons/fut1.png",
-  };
-
-  self.registration.showNotification("Notificación", options);
 });

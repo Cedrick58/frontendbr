@@ -63,6 +63,11 @@ function Main() {
     } catch (error) {
       console.error("Error en el registro del Service Worker:", error);
     }
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js') // o la ruta correcta
+    .then(reg => console.log('SW registrado:', reg))
+    .catch(err => console.error('Error al registrar SW:', err));
+}
   };
 
   useEffect(() => {
