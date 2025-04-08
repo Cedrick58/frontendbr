@@ -40,7 +40,7 @@
 }
 
 .send-message-btn {
-  background-color: #4CAF50;
+  background-color: #1612f8;
   color: white;
   padding: 8px 16px;
   border-radius: 5px;
@@ -48,7 +48,7 @@
 }
 
 .send-message-btn:hover {
-  background-color: #45a049;
+  background-color: #1612f8;
 }
 
 .modal {
@@ -85,7 +85,7 @@
 }
 
 .close-btn, .send-btn {
-  background-color: #ff6d00;
+  background-color: #1612f8;
   color: white;
   border: none;
   padding: 10px 20px;

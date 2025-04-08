@@ -44,7 +44,7 @@ const styles = {
     gap: '20px',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#1612f8',
     color: 'white',
     padding: '15px 25px',
     textDecoration: 'none',
