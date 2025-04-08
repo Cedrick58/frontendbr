@@ -52,7 +52,7 @@ const Register = () => {
 
   function insertIndexedDB(data) {
     let dbRequest = window.indexedDB.open("database", 2);
-  
+
     dbRequest.onupgradeneeded = (event) => {
       const db = event.target.result;
       if (!db.objectStoreNames.contains("Usuarios")) {
@@ -60,47 +60,44 @@ const Register = () => {
         console.log("✅ 'Usuarios' object store creado.");
       }
     };
-  
+
     dbRequest.onsuccess = (event) => {
       const db = event.target.result;
-  
+
       if (db.objectStoreNames.contains("Usuarios")) {
         const transaction = db.transaction("Usuarios", "readwrite");
         const objStore = transaction.objectStore("Usuarios");
-  
+
         const addRequest = objStore.add(data);
-  
+
         addRequest.onsuccess = () => {
           console.log("✅ Datos insertados en IndexedDB:", addRequest.result);
-  
-          // Si hay soporte para SyncManager, registrar la sincronización
+          
           if ('serviceWorker' in navigator && 'SyncManager' in window) {
             navigator.serviceWorker.ready.then((registration) => {
               console.log("Intentando registrar la sincronización...");
-              registration.sync.register("syncUsuarios")
-                .then(() => {
-                  console.log("✅ Sincronización registrada con éxito");
-                })
-                .catch((err) => {
-                  console.error("❌ Error registrando la sincronización:", err);
-                });
+              registration.sync.register("syncUsuarios");
+              self.registration.sync.register("sync"); 
+            }).then(() => {
+              console.log("✅ Sincronización registrada con éxito");
+            }).catch((err) => {
+              console.error("❌ Error registrando la sincronización:", err);
             });
           } else {
             console.warn("⚠️ Background Sync no es soportado en este navegador.");
           }
         };
-  
+
         addRequest.onerror = () => {
           console.error("❌ Error insertando en IndexedDB");
         };
       }
     };
-  
+
     dbRequest.onerror = () => {
       console.error("❌ Error abriendo IndexedDB");
     };
   }
-  
   
   return (
     <div style={styles.container}>
