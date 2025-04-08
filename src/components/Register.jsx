@@ -21,13 +21,13 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
+  
     if (!isOnline) {
       setError('No estás conectado a Internet. Los datos se guardarán localmente.');
       insertIndexedDB({ email, nombre, password });
       return;
     }
-
+  
     try {
       const response = await fetch('https://backend-5it1.onrender.com/auth/register', {
         method: 'POST',
@@ -36,9 +36,9 @@ const Register = () => {
         },
         body: JSON.stringify({ email, nombre, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         alert('Registro exitoso. Ahora puedes iniciar sesión.');
         navigate('/login');
@@ -51,54 +51,65 @@ const Register = () => {
   };
 
   function insertIndexedDB(data) {
-    let dbRequest = window.indexedDB.open("database", 2);
-
+    let dbRequest = window.indexedDB.open("database", 2); // Asegúrate de usar una versión específica
+  
     dbRequest.onupgradeneeded = (event) => {
       const db = event.target.result;
+  
+      // Crear el object store 'Usuarios' si no existe
       if (!db.objectStoreNames.contains("Usuarios")) {
         db.createObjectStore("Usuarios", { keyPath: "email" });
         console.log("✅ 'Usuarios' object store creado.");
+      } else {
+        console.log("⚠️ 'Usuarios' object store ya existe.");
       }
     };
-
+  
     dbRequest.onsuccess = (event) => {
       const db = event.target.result;
-
+  
+      // Verificar si el object store existe antes de insertar los datos
       if (db.objectStoreNames.contains("Usuarios")) {
         const transaction = db.transaction("Usuarios", "readwrite");
         const objStore = transaction.objectStore("Usuarios");
-
+  
         const addRequest = objStore.add(data);
-
+  
         addRequest.onsuccess = () => {
           console.log("✅ Datos insertados en IndexedDB:", addRequest.result);
-          
+  
+          // Sincronizar datos si el navegador soporta Background Sync
           if ('serviceWorker' in navigator && 'SyncManager' in window) {
-            navigator.serviceWorker.ready.then((registration) => {
-              console.log("Intentando registrar la sincronización...");
-              registration.sync.register("syncUsuarios");
-              self.registration.sync.register("sync"); 
-            }).then(() => {
-              console.log("✅ Sincronización registrada con éxito");
-            }).catch((err) => {
-              console.error("❌ Error registrando la sincronización:", err);
-            });
+            navigator.serviceWorker.ready
+              .then((registration) => {
+                console.log("Intentando registrar la sincronización...");
+                return registration.sync.register("syncUsuarios");
+              })
+              .then(() => {
+                console.log("✅ Sincronización registrada con éxito");
+              })
+              .catch((err) => {
+                console.error("❌ Error registrando la sincronización:", err);
+              });
           } else {
             console.warn("⚠️ Background Sync no es soportado en este navegador.");
           }
         };
-
+  
         addRequest.onerror = () => {
           console.error("❌ Error insertando en IndexedDB");
         };
+      } else {
+        console.error("❌ El object store 'Usuarios' no existe.");
       }
     };
-
+  
     dbRequest.onerror = () => {
       console.error("❌ Error abriendo IndexedDB");
     };
   }
   
+
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleRegister}>
