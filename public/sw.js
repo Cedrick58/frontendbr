@@ -12,12 +12,8 @@ const APP_SHELL_FILES = [
   '/components/Home.jsx',
   '/components/Login.jsx',
   '/components/Register.jsx',
-  '/icons/sao_1.png',
-  '/icons/sao_2.png',
-  '/icons/sao_3.png',
+  '/icons/fut1.png',
   '/icons/carga.png',
-  '/screenshots/cap.png',
-  '/screenshots/cap1.png'
 ];
 
 self.addEventListener('install', event => {
@@ -185,7 +181,7 @@ self.addEventListener("push", (event) => {
   let options={
       body:event.data.text(),
       
-      image: "./icons/sao_1.png",
+      image: "./icons/fut1.png",
   }
   
   self.registration.showNotification("Titulo",options); 

@@ -8,30 +8,12 @@
   "description": "Esta es una aplicación web progresiva (PWA) para enviar notificaciones.",
   "icons": [
     {
-      "src": "/icons/sao_3.png",
+      "src": "/icons/fut1.png",
       "sizes": "92x92",
       "type": "image/png"
-    },
-    {
-      "src": "/icons/sao_2.png",
-      "sizes": "512x512",
-      "type": "image/png"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/cap.png",
-      "sizes": "1863x945",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/cap1.png",
-      "sizes": "1080x548",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
+ 
   "splash_icons": [
     {
       "src": "/icons/carga.png",
