@@ -135,7 +135,7 @@ function Main() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3">📭 No hay usuarios suscritos</td>
+                    <td colSpan="3">📭 Zona futbolera</td>
                   </tr>
                 )}
               </tbody>
@@ -143,7 +143,7 @@ function Main() {
           )}
         </div>
       ) : (
-        <p>⚠️ No tienes permisos para ver esta página.</p>
+        <p>⚠️ Calendario de la liga proximamente...</p>
       )}
     </div>
   );
