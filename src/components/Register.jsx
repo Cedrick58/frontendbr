@@ -160,7 +160,7 @@ const styles = {
   },
   heading: {
     fontSize: '2rem',
-    color: '#4CAF50',
+    color: '#1612f8',
     marginBottom: '20px',
   },
   input: {
@@ -176,7 +176,7 @@ const styles = {
   button: {
     width: '100%',
     padding: '12px',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#1612f8',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
