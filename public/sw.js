@@ -16,16 +16,28 @@ const APP_SHELL_FILES = [
   '/icons/carga.png',
 ];
 
-self.addEventListener('install', event => {
-  self.skipWaiting();  // Forzar la instalación del nuevo SW
-});
-
 // Instalación del Service Worker y caché
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(APP_SHELL_CACHE).then(cache => cache.addAll(APP_SHELL_FILES))
   );
-  self.skipWaiting();
+});
+
+// Activación del SW y limpieza de caché antigua
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== APP_SHELL_CACHE && key !== DYNAMIC_CACHE) {
+            console.log("Eliminando caché antigua:", key);
+            return caches.delete(key);
+          }
+        })
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
 // Guardar en IndexedDB en caso de fallo de red
@@ -62,12 +74,12 @@ function InsertIndexedDB(data) {
 
 // Interceptar solicitudes
 self.addEventListener('fetch', event => {
-  if (!event.request.url.startsWith("http")) return; // Evita problemas con extensiones
+  if (!event.request.url.startsWith("http")) return;
 
   if (event.request.method === "POST") {
     event.respondWith(
       event.request.clone().json()
-        .then(body => 
+        .then(body =>
           fetch(event.request)
             .catch(() => {
               InsertIndexedDB(body);
@@ -76,14 +88,21 @@ self.addEventListener('fetch', event => {
               });
             })
         )
-        .catch(error => console.error("Error en fetch POST:", error))
+        .catch(error => {
+          console.error("Error en fetch POST:", error);
+          return new Response(JSON.stringify({ message: "Error procesando solicitud" }), {
+            headers: { "Content-Type": "application/json" }
+          });
+        })
     );
   } else {
     event.respondWith(
       fetch(event.request)
         .then(response => {
           let clone = response.clone();
-          caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
+          if (event.request.method === 'GET') {
+            caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
@@ -137,6 +156,7 @@ self.addEventListener('sync', event => {
                 } else {
                   console.error("Algunas respuestas fallaron:", responses);
                 }
+                resolve();
               })
               .catch(error => {
                 console.error("Error al sincronizar con la API:", error);
@@ -159,31 +179,12 @@ self.addEventListener('sync', event => {
   }
 });
 
-// Activación del SW y limpieza de caché antigua
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== APP_SHELL_CACHE && key !== DYNAMIC_CACHE) {
-            console.log("Eliminando caché antigua:", key);
-            return caches.delete(key);
-          }
-        })
-      )
-    ).then(() => self.clients.claim())
-  );
-});
+// Notificaciones push
+self.addEventListener("push", event => {
+  let options = {
+    body: event.data.text(),
+    image: "./icons/fut1.png",
+  };
 
-
-self.addEventListener("push", (event) => {
-
-  let options={
-      body:event.data.text(),
-      
-      image: "./icons/fut1.png",
-  }
-  
-  self.registration.showNotification("Titulo",options); 
-   
+  self.registration.showNotification("Titulo", options);
 });
